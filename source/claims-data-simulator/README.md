@@ -85,7 +85,7 @@ Every response is wrapped in an **envelope** containing metadata and the list of
 | Field                    | Type              | Required | Nullable | Description                                                          |
 |--------------------------|-------------------|----------|----------|----------------------------------------------------------------------|
 | `claim_id`               | string            | Yes      | No       | Natural key. Format: `CLM-<YYYY>-<8-digit sequence>`                 |
-| `patient_id`             | string            | Yes      | Yes\*    | Format: `PAT-<7-digit>`. See [data quality](#simulated-data-quality-issues). |
+| `patient_id`             | string            | Yes      | No\*     | Format: `PAT-<7-digit>`. See [data quality](#simulated-data-quality-issues). |
 | `payer_id`               | string            | Yes      | No       | Payer identifier (e.g., `PAYER-UHC-001`)                             |
 | `payer_name`             | string            | Yes      | No       | Human-readable payer name                                            |
 | `plan_type`              | string            | Yes      | No       | One of `HMO`, `PPO`, `EPO`, `POS`, `HDHP`                            |
@@ -109,7 +109,7 @@ Every response is wrapped in an **envelope** containing metadata and the list of
 | `created_at`             | string (ISO 8601) | Yes      | No       | UTC timestamp when the claim was first created. Immutable.           |
 | `last_updated_at`        | string (ISO 8601) | Yes      | No       | UTC timestamp of the most recent change. Equals `created_at` at creation. |
 
-\* `patient_id` is only ever null via the `null_patient_id=true` response-only data-quality injection. In the persisted database it is always populated.
+\* `patient_id` is not nullable in the schema or in the persisted database — it is always populated. It only ever appears as `null` in a response via the `null_patient_id=true` data-quality injection, which mutates the response object only. See [Simulated Data Quality Issues](#simulated-data-quality-issues).
 
 ### ClaimLine (child entity)
 
@@ -132,8 +132,8 @@ Every response is wrapped in an **envelope** containing metadata and the list of
 ### Summary of optional vs nullable
 
 - **Optional** (may be absent from the payload): `denial_reason_code` only. Absent when the claim is not denied.
-- **Nullable** (always present but may be `null`): `patient_id`\*, `adjudicated_date`, `total_allowed_amount`, `total_paid_amount`, `patient_responsibility`, `modifier_1`, `modifier_2`, `allowed_amount`, `paid_amount`.
-- **Required and non-nullable**: all other fields.
+- **Nullable** (always present but may be `null`): `adjudicated_date`, `total_allowed_amount`, `total_paid_amount`, `patient_responsibility`, `modifier_1`, `modifier_2`, `allowed_amount`, `paid_amount`.
+- **Required and non-nullable**: all other fields, including `patient_id`\*.
 
 ---
 
