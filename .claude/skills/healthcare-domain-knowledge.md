@@ -54,7 +54,7 @@ Round all amounts to 2 decimal places. The `patient_responsibility` should equal
 | Field                    | Type          | Required | Nullable | Notes                                                        |
 |--------------------------|---------------|----------|----------|--------------------------------------------------------------|
 | `claim_id`               | string        | Yes      | No       | Natural key; format `CLM-<YYYY>-<8-digit sequence>`          |
-| `patient_id`             | string        | Yes      | Yes*     | Format `PAT-<7-digit>`. See data-quality notes.              |
+| `patient_id`             | string        | Yes      | No*      | Format `PAT-<7-digit>`. See data-quality notes.              |
 | `payer_id`               | string        | Yes      | No       |                                                              |
 | `payer_name`             | string        | Yes      | No       | e.g., UnitedHealthcare, Aetna, Cigna                         |
 | `plan_type`              | string        | Yes      | No       | `HMO`, `PPO`, `EPO`, `POS`, `HDHP`                           |
@@ -78,7 +78,7 @@ Round all amounts to 2 decimal places. The `patient_responsibility` should equal
 | `created_at`             | timestamp     | Yes      | No       | Immutable after creation                                     |
 | `last_updated_at`        | timestamp     | Yes      | No       | Equals `created_at` on creation; bumped on any mutation      |
 
-`*` `patient_id` is only ever null through the `null_patient_id=true` response-level injection; it is never persisted as null.
+`*` `patient_id` is **not nullable** in the schema or in the persisted database — it is always populated. It only ever appears as `null` in a response via the `null_patient_id=true` data-quality injection, which mutates the response object only (see the api-implementation skill).
 
 ## Child Schema — `ClaimLine`
 
