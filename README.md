@@ -24,8 +24,8 @@ A hands-on learning project for **Apache Iceberg** table concepts, using simulat
 ```
 
 1. **API** (`source/`) — a FastAPI service backed by Postgres generates simulated claims on demand. Every call returns all historical + new + updated records, with realistic adjudication lifecycle mutations. See [`source/README.md`](./source/README.md) for full details.
-2. **Ingest job** (`transformation/`) — a PySpark job pulls the API response and lands the raw nested claims payload into Iceberg bronze tables in S3. Incremental behavior is driven by `last_updated_at`.
-3. **Transform job** (`transformation/`) — a PySpark job reads bronze, applies SCD Type II merges, flattens the nested `claim_lines` into its own normalized table (with a foreign key back to the parent claim), and writes analytics-ready silver/gold Iceberg tables.
+2. **Ingest job** (`transformation/`) — a PySpark job pulls the API response and lands the raw nested claims payload into Iceberg tables in S3. Incremental behavior is driven by `last_updated_at`.
+3. **Transform job** (`transformation/`) — a PySpark job reads raw tables, applies SCD Type II merges, flattens the nested `claim_lines` into its own normalized table (with a foreign key back to the parent claim), and writes analytics-ready bronze Iceberg tables.
 
 ## Infrastructure
 
