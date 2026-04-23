@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: claims
+      POSTGRES_USER: claims_user
+      POSTGRES_PASSWORD: claims_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claims_user -d claims"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: source/claims-data-simulator
+    environment:
+      DATABASE_URL: postgresql+psycopg://claims_user:claims_pass@postgres:5432/claims
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # spark:
+  #   Placeholder for the PySpark ingestion/transformation service.
+  #   Will build from transformation/ and connect to the api service
+  #   and external Iceberg storage (S3 + Glue catalog).
+
+volumes:
+  postgres_data:
